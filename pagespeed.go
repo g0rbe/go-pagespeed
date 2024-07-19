@@ -48,3 +48,28 @@ func Run(opt Options) (*Result, error) {
 
 	return res, nil
 }
+
+func (r *Result) LighthouseScores() LighthouseScores {
+
+	v := LighthouseScores{URL: r.ID}
+
+	for k := range r.LighthouseResult.Categories {
+
+		switch k {
+		case "performance":
+			v.Performance = int(r.LighthouseResult.Categories[k].Score * 100)
+		case "accessibility":
+			v.Accessibility = int(r.LighthouseResult.Categories[k].Score * 100)
+		case "best-practices":
+			v.BestPractices = int(r.LighthouseResult.Categories[k].Score * 100)
+		case "seo":
+			v.SEO = int(r.LighthouseResult.Categories[k].Score * 100)
+		case "pwa":
+			v.PWA = int(r.LighthouseResult.Categories[k].Score * 100)
+		default:
+			panic(fmt.Sprintf("invalid lighthouse category: %s", k))
+		}
+	}
+
+	return v
+}
