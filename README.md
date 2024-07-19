@@ -5,6 +5,8 @@
 
 Golang module to the PageSpeed Insights API v5.
 
+Google Docs: [Get Started with the PageSpeed Insights API](https://developers.google.com/speed/docs/insights/v5/get-started)
+
 Get:
 ```bash
 go get github.com/g0rbe/go-pagespeed@latest
