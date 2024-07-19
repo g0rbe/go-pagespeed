@@ -9,7 +9,7 @@ const (
 	CategoryPWA           = "PWA"
 )
 
-// Possible values for startegy paramater
+// Possible values for strategy paramater
 const (
 	StrategyDesktop = "dektop"
 	StrategyMobile  = "mobile"
