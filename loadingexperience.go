@@ -9,7 +9,7 @@ type Distribution struct {
 type Metric struct {
 	Percentile    int            `json:"percentile"`
 	Distributions []Distribution `json:"distributions"`
-	Category      int            `json:"category"`
+	Category      string         `json:"category"`
 }
 
 type LoadingExperience struct {
