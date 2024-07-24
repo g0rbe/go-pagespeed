@@ -11,6 +11,13 @@ type LighthouseScores struct {
 	PWA           int    `json:",omitempty" yaml:",omitempty"`
 }
 
+func RunLighthouse(opts *Options) (*LighthouseScores, error) {
+
+	res, err := RunPagespeed(opts)
+
+	return res.LighthouseScores(), err
+}
+
 func (l LighthouseScores) String() string {
 
 	v := fmt.Sprintf("%s\n", l.URL)
