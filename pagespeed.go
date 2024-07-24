@@ -22,7 +22,7 @@ type Result struct {
 	AnalysisUTCTimestamp    time.Time         `json:"analysisUTCTimestamp"`
 }
 
-func Run(opt Options) (*Result, error) {
+func RunPagespeed(opt *Options) (*Result, error) {
 
 	resp, err := http.Get(opt.RequestURL())
 	if err != nil {
@@ -30,13 +30,20 @@ func Run(opt Options) (*Result, error) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
-		return nil, fmt.Errorf(resp.Status)
-	}
-
 	data, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read body: %w", err)
+	}
+
+	if resp.StatusCode != 200 {
+
+		var e RuntimeError
+		err = json.Unmarshal(data, &e)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal RuntimeError: %w", err)
+		}
+
+		return nil, e
 	}
 
 	res := new(Result)
@@ -49,9 +56,15 @@ func Run(opt Options) (*Result, error) {
 	return res, nil
 }
 
-func (r *Result) LighthouseScores() LighthouseScores {
+func (r *Result) LighthouseScores() *LighthouseScores {
 
-	v := LighthouseScores{URL: r.ID}
+	if r == nil {
+		return nil
+	}
+
+	v := new(LighthouseScores)
+
+	v.URL = r.ID
 
 	for k := range r.LighthouseResult.Categories {
 

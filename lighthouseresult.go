@@ -43,11 +43,6 @@ type CategoryGroup struct {
 	Description string `json:"description"`
 }
 
-type RuntimeError struct {
-	Code    string `json:"code"`
-	Message string `json:"message"`
-}
-
 type Timing struct {
 	Total float32 `json:"total"`
 }
