@@ -22,9 +22,9 @@ type Result struct {
 	AnalysisUTCTimestamp    time.Time         `json:"analysisUTCTimestamp"`
 }
 
-func RunPagespeed(opt *Options) (*Result, error) {
+func RunPagespeed(u string, opt *Options) (*Result, error) {
 
-	resp, err := http.Get(opt.RequestURL())
+	resp, err := http.Get(opt.RequestURL(u))
 	if err != nil {
 		return nil, fmt.Errorf("http error: %w", err)
 	}

@@ -9,11 +9,12 @@ type LighthouseScores struct {
 	BestPractices int    `json:",omitempty" yaml:",omitempty"`
 	SEO           int    `json:",omitempty" yaml:",omitempty"`
 	PWA           int    `json:",omitempty" yaml:",omitempty"`
+	Error         error  `json:",omitempty" yaml:",omitempty"`
 }
 
-func RunLighthouse(opts *Options) (*LighthouseScores, error) {
+func RunLighthouse(u string, opts *Options) (*LighthouseScores, error) {
 
-	res, err := RunPagespeed(opts)
+	res, err := RunPagespeed(u, opts)
 
 	return res.LighthouseScores(), err
 }
@@ -43,4 +44,8 @@ func (l LighthouseScores) String() string {
 	}
 
 	return v
+}
+
+func (l *LighthouseScores) Total() int {
+	return l.Performance + l.Accessibility + l.BestPractices + l.SEO + l.PWA
 }

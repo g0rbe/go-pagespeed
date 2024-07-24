@@ -1,5 +1,7 @@
 package pagespeed
 
+import "sync"
+
 // Possible values for category paramater
 const (
 	CategoryAccessibility = "ACCESSIBILITY"
@@ -21,43 +23,90 @@ var (
 )
 
 type Options struct {
-	URL         string   // The URL to fetch and analyze
-	Key         string   // API Key
-	Category    []string // A Lighthouse category to run; if none are given, only Performance category will be run.
-	Locale      string   // The locale used to localize formatted results
-	Strategy    string   // The analysis strategy (desktop or mobile) to use, and desktop is the default
-	UTMCampaign string   // Campaign name for analytics.
-	UTMSource   string   // Campaign source for analytics.
+	key         string   // API Key
+	category    []string // A Lighthouse category to run; if none are given, only Performance category will be run.
+	locale      string   // The locale used to localize formatted results
+	strategy    string   // The analysis strategy (desktop or mobile) to use, and desktop is the default
+	utmCampaign string   // Campaign name for analytics.
+	utmSource   string   // Campaign source for analytics.
+	m           *sync.RWMutex
 }
 
-func (o *Options) RequestURL() string {
+func NewOptions() *Options {
+
+	o := new(Options)
+	o.m = new(sync.RWMutex)
+
+	return o
+}
+
+func FullAnalysis() *Options {
+
+	o := NewOptions()
+	o.SetCategories(CategoryAll)
+
+	return o
+}
+
+func FullAnalysisWithKey(k string) *Options {
+
+	o := NewOptions()
+	o.SetCategories(CategoryAll)
+	o.SetKey(k)
+
+	return o
+}
+
+func (o *Options) SetKey(v string) {
+
+	o.m.Lock()
+
+	o.key = v
+
+	o.m.Unlock()
+}
+
+func (o *Options) SetCategories(c []string) {
+
+	o.m.Lock()
+
+	o.category = c
+
+	o.m.Unlock()
+}
+
+// RequestURL creates the request URL to analyze URL u.
+func (o *Options) RequestURL(u string) string {
+
+	o.m.RLock()
+	defer o.m.RUnlock()
 
 	v := ApiEndpoint
 
-	v += "?url=" + o.URL
+	v += "?url=" + u
 
-	if o.Key != "" {
-		v += "&key=" + o.Key
+	if o.key != "" {
+		v += "&key=" + o.key
 	}
 
-	for i := range o.Category {
-		v += "&category=" + o.Category[i]
+	for i := range o.category {
+		v += "&category=" + o.category[i]
 	}
 
-	if o.Locale != "" {
-		v += "&locale=" + o.Locale
+	if o.locale != "" {
+		v += "&locale=" + o.locale
 	}
 
-	if o.Strategy != "" {
-		v += "&strategy=" + o.Strategy
+	if o.strategy != "" {
+		v += "&strategy=" + o.strategy
 	}
 
-	if o.UTMCampaign != "" {
-		v += "&utm_campaign=" + o.UTMCampaign
+	if o.utmCampaign != "" {
+		v += "&utm_campaign=" + o.utmCampaign
 	}
 
-	if o.UTMSource != "" {
-		v += "&utm_source=" + o.UTMSource
+	if o.utmSource != "" {
+		v += "&utm_source=" + o.utmSource
 	}
 
 	return v
